@@ -9,7 +9,7 @@
         height="500"
       >
         <v-card-title>
-          <h1 class="mx-auto">Country</h1>
+          <h1 class="mt-5 mx-auto">Country</h1>
         </v-card-title>
         <v-row>
           <v-col cols="10" class="mx-auto">
@@ -109,7 +109,6 @@ export default {
       return this.$router.push("/data/" + name);
     },
     hover(name) {
-      console.log("tes");
       document.getElementById(name).style.backgroundColor =
         " rgba(84, 84, 84, 0.492)";
     },
@@ -124,6 +123,7 @@ export default {
 #cards {
   border: solid #66abffd1;
   border-radius: 10px;
+  background: linear-gradient(to bottom right, #abfbff, #abf1ff);
 }
 a {
   font-size: large;
