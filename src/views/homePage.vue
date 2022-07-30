@@ -15,7 +15,6 @@
           <v-col cols="10" class="mx-auto">
             <v-text-field
               v-model="auto"
-              id="textField"
               class="mt-5"
               color="purple accent-4"
               append-icon="mdi-magnify"
@@ -78,18 +77,7 @@ export default {
     };
   },
 
-  async mounted() {
-    document.getElementById("textField").onkeyup = setTimeout(function () {
-      myNetod();
-    }, 5000);
-
-    function myNetod() {
-      console.log("assalamualikum");
-    }
-    await setTimeout(function () {
-      console.log("asssalamuaikum");
-    }, 5000);
-  },
+  mounted() {},
 
   methods: {
     isTyping() {
@@ -98,7 +86,7 @@ export default {
         .then((res) => {
           this.names = res.data;
           this.newName = this.names.splice(0, 5);
-          console.log("hemmm", this.newName);
+
           if (res) {
             this.alert = false;
             document.getElementById("fullId").style.display = "block";
@@ -109,7 +97,6 @@ export default {
         })
         //Handler Err
         .catch((err) => {
-          console.error("ini response", err);
           if (err) {
             this.alert = true;
             document.getElementById("fullId").style.display = "none";

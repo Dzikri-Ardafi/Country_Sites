@@ -153,7 +153,7 @@ export default {
     );
     this.dataCountry = response.data[0];
     const latlong = this.dataCountry.latlng;
-    console.log("pasti eror", this.dataCountry.altSpellings[2]);
+
     //CONTROL CHIPS ACTIVE OR NOT
     if (this.dataCountry.altSpellings[0] == undefined) {
       this.active_0 = false;
@@ -165,7 +165,7 @@ export default {
       this.active_2 = false;
     }
     //GET DATA CALLING CODE
-    console.log(this.dataCountry);
+
     for (let i = 0; i < latlong.length; i++) {
       this.latlong = latlong[0] + ", " + latlong[1];
     }
