@@ -8,25 +8,18 @@
         {{ names.name }}
         <span>
           <v-avatar tile>
-            <img :src="dataCountry.flags.svg" alt="" />
+            <img :src="dataCountry.flag" alt="" />
           </v-avatar>
         </span>
       </h1>
-      <v-chip id="chips" :active="active_0">
-        <h5>
-          {{ dataCountry.altSpellings[0] }}
-        </h5>
-      </v-chip>
-      <v-chip id="chips" class="mx-3" :active="active_1">
-        <h5>
-          {{ dataCountry.altSpellings[1] }}
-        </h5>
-      </v-chip>
-      <v-chip id="chips" :active="active_2">
-        <h5>
-          {{ dataCountry.altSpellings[2] }}
-        </h5>
-      </v-chip>
+      <div class="d-flex" style="display: grid; column-gap: 1em">
+        <v-chip v-for="data in dataCountry.altSpellings" :key="data" id="chips">
+          <h5>
+            {{ data }}
+          </h5>
+        </v-chip>
+      </div>
+
       <br />
       <v-row class="mt-10">
         <v-col cols="3">
@@ -38,8 +31,8 @@
           </h3>
 
           <h3 class="mt-12">Calling Code</h3>
-          <h1>
-            {{ dataCountry.callingCodes[0] }}
+          <h1 v-for="data in dataCountry.callingCodes" :key="data">
+            {{ data }}
           </h1>
           <div>
             <span>
@@ -91,9 +84,11 @@
           <div class="mt-15 mx-5">
             <h3 class="">
               Currency
-              <h1>
-                {{ dataCountry.currencies[0].code }}
-              </h1>
+              <div v-for="data in dataCountry.currencies" :key="data">
+                <h1>
+                  {{ data.code }}
+                </h1>
+              </div>
             </h3>
 
             <div>
@@ -129,9 +124,6 @@ export default {
   name: "DataPage",
   data() {
     return {
-      active_0: true,
-      active_1: true,
-      active_2: true,
       dataCountry: [],
       latlong: "",
       lengthCallingCode: null,
@@ -144,41 +136,49 @@ export default {
     names() {
       return this.$route.params;
     },
+    callingCodes() {
+      return this.$store.state.callingCodes;
+    },
+    currency() {
+      return this.$store.state.currency;
+    },
   },
 
-  async mounted() {
-    //GET ALL DATA
-    const response = await axios.get(
-      "/name/" + this.names.name + "?fullText=true"
-    );
-    this.dataCountry = response.data[0];
-    const latlong = this.dataCountry.latlng;
-
-    //CONTROL CHIPS ACTIVE OR NOT
-    if (this.dataCountry.altSpellings[0] == undefined) {
-      this.active_0 = false;
-    }
-    if (this.dataCountry.altSpellings[1] == undefined) {
-      this.active_1 = false;
-    }
-    if (this.dataCountry.altSpellings[2] == undefined) {
-      this.active_2 = false;
-    }
-    //GET DATA CALLING CODE
-
-    for (let i = 0; i < latlong.length; i++) {
-      this.latlong = latlong[0] + ", " + latlong[1];
-    }
-    //GET LENGTH ARRAY CALLING CODE
-    this.codeCalling = localStorage.getItem("codeCalling");
-    const result = await axios.get("callingcode/" + this.codeCalling);
-    this.lengthCallingCode = result.data.length;
-    this.sameCallingCode = result.data;
-    //GET LENGTH ARRAY CURRENCY
-    this.codeCurrency = localStorage.getItem("codeCurrency");
-    const res = await axios.get("currency/" + this.codeCurrency);
-    this.lengthCurrency = res.data.length;
-    this.sameCurrency = res.data;
+  mounted() {
+    this.getAllData();
+    this.getCallingCodeData();
+    this.getCurrencyData();
+  },
+  methods: {
+    getAllData() {
+      axios
+        .get("/name/" + this.names.name + "?fullText=true")
+        .then((response) => {
+          this.dataCountry = response.data[0];
+          const latlong = this.dataCountry.latlng;
+          let latlongString = "";
+          latlong.forEach((item) => {
+            if (latlongString) {
+              latlongString = `${latlongString}, ${item}`;
+            } else {
+              latlongString = `${item}`;
+            }
+          });
+          this.latlong = latlongString;
+        });
+    },
+    getCallingCodeData() {
+      this.$store.dispatch("getCallingCode").then(() => {
+        this.lengthCallingCode = this.callingCodes.length;
+        this.sameCallingCode = this.callingCodes;
+      });
+    },
+    getCurrencyData() {
+      this.$store.dispatch("getCurrency").then(() => {
+        this.lengthCurrency = this.currency.length;
+        this.sameCurrency = this.currency;
+      });
+    },
   },
 };
 </script>
