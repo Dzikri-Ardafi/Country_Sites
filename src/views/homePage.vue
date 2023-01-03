@@ -14,7 +14,7 @@
         <v-row>
           <v-col cols="10" class="mx-auto">
             <v-text-field
-              v-model="auto"
+              v-model="modelValue"
               class="mt-5"
               color="purple accent-4"
               append-icon="mdi-magnify"
@@ -23,20 +23,19 @@
               item-text="name.common"
               label="Type any country name"
               @keyup="isTyping"
+              @input="changeValue"
             ></v-text-field>
-            <v-alert
-              v-if="isCountries === false"
-              shaped
-              outlined
-              dense
-              :value="alert"
-              type="error"
-            >
-              Data Not Found
-            </v-alert>
 
-            <div v-if="isCountries === true">
+            <div v-if="countries.length > 0">
+              <div v-if="isGetData" class="d-flex justify-center">
+                <div></div>
+                <v-progress-circular
+                  color="rgba(1, 104, 144, 0.653)"
+                  indeterminate
+                ></v-progress-circular>
+              </div>
               <div
+                v-else
                 v-for="data in countries"
                 :id="data.name"
                 width="100"
@@ -53,6 +52,16 @@
                 </a>
               </div>
             </div>
+            <v-alert
+              v-if="err"
+              shaped
+              outlined
+              dense
+              :value="alert"
+              type="error"
+            >
+              Data Not Found
+            </v-alert>
           </v-col>
         </v-row>
       </v-card>
@@ -61,20 +70,17 @@
 </template>
 
 <script>
-// import axios from "axios";
 import _ from "lodash";
 
 export default {
   name: "HomePage",
   data() {
     return {
-      names: [],
       alert: true,
-      text: true,
-      newName: [],
-      auto: "",
-      result: "",
-      isCountries: true,
+      DataCountries: [],
+      err: false,
+      modelValue: "",
+      isGetData: false,
     };
   },
   computed: {
@@ -101,22 +107,25 @@ export default {
 
           this.$store
             .dispatch("getNation", value)
-            .then((res) => {
-              if (res) {
-                this.isCountries = true;
-              }
+            .then(() => {
+              this.isGetData = false;
             })
             .catch((err) => {
               if (err) {
-                this.isCountries = false;
-                this.alert = true;
+                this.err = true;
+                this.isGetData = false;
+                this.countries.length = 0;
               }
             });
         }
       },
-      [300]
+      [500]
     ),
-
+    changeValue() {
+      if (this.modelValue) {
+        this.isGetData = true;
+      }
+    },
     redirect(name) {
       this.$router.push("/data/" + name);
     },
@@ -135,6 +144,7 @@ a {
 }
 .divClass:hover {
   background-color: rgba(6, 218, 193, 0.492);
+  /* color: rgba(1, 104, 144, 0.653); */
   cursor: pointer;
   border-radius: 5px;
 }
